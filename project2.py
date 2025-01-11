@@ -15,6 +15,62 @@ bg_color = (0.0,0.0,0.0,0.0)
 is_game_paused = False
 game_over = False
 
+# Bubble initialization
+initial_bubbles = 5
+bubbles = [
+    {
+        "position": [random.randint(0, 49), random.randint(0, 49)],
+        "direction": [random.choice([-1, 1]), random.choice([-1, 1])],
+        "speed": random.uniform(0.5, 0.5),
+    }
+    for _ in range(initial_bubbles)
+]
+
+# Modified drawBubble function to draw all bubbles
+def drawBubbles():
+    for bubble in bubbles:
+        glColor3f(1.0, 0.0, 1.0)  # Purple bubble
+        glBegin(GL_POINTS)
+        drawCircle(bubble["position"][0] * 10 + 5, bubble["position"][1] * 10 + 5, 4)
+        glEnd()
+
+# Modified moveBubble function to ensure proper position updates and screen boundaries
+def moveBubbles():
+    global bubbles, game_over, score
+
+    for bubble in bubbles:
+        # Update bubble position
+        bubble["position"][0] += bubble["direction"][0] * bubble["speed"]
+        bubble["position"][1] += bubble["direction"][1] * bubble["speed"]
+
+        # Handle boundary collisions (bounce back)
+        if bubble["position"][0] < 0 or bubble["position"][0] > 49:
+            bubble["direction"][0] *= -1
+        if bubble["position"][1] < 0 or bubble["position"][1] > 49:
+            bubble["direction"][1] *= -1
+
+        # Check for collision with snake
+        for seg in snake_state:
+            if (int(bubble["position"][0]), int(bubble["position"][1])) == seg:
+                game_over = True
+                print(f"Game Over\n=====\nTotal Score: {score}\n=====")
+                break
+
+# Check and adjust the number of bubbles based on score
+def adjustBubbles():
+    global bubbles, score
+    target_bubbles = max(1, initial_bubbles - score // 100)
+
+    if len(bubbles) > target_bubbles:
+        # Calculate the number of bubbles to be removed
+        bubbles_to_remove = len(bubbles) - target_bubbles
+
+        # Remove excess bubbles
+        bubbles = bubbles[:target_bubbles]
+
+        # Increase the speed of remaining bubbles
+        for bubble in bubbles:
+            bubble["speed"] += bubbles_to_remove + 0.002
 
 # Find Zone of the points
 def findZone(x1, y1, x2, y2):
@@ -39,7 +95,6 @@ def findZone(x1, y1, x2, y2):
        zone = 7
    return zone
 
-
 # Other Zones --> Zone 0
 def forConvertZone(x, y, zone):
    if zone == 0:  # Zone 0 --> Zone 0
@@ -58,7 +113,6 @@ def forConvertZone(x, y, zone):
        return -y, x
    elif zone == 7:  # Zone 7 --> Zone 0
        return x, -y
-
 
 # Zone 0 --> Other zones
 def backConvertZone(x, y, zone):
@@ -79,8 +133,6 @@ def backConvertZone(x, y, zone):
    elif zone == 7:  # zone 0 --> zone 7
        return x, -y
 
-
-
 # Midpoint Line Algorithm
 def drawLines(x1, y1, x2, y2):
    zone = findZone(x1, y1, x2, y2)
@@ -91,7 +143,6 @@ def drawLines(x1, y1, x2, y2):
    d = (2 * dy) - dx
    incrNE = 2 * (dy - dx)
    incrE = 2 * dy
-
 
    while conv_x1 < conv_x2:
        if d < 0:
@@ -104,18 +155,11 @@ def drawLines(x1, y1, x2, y2):
        temp_x, temp_y = backConvertZone(conv_x1, conv_y1, zone)
        glVertex2f(temp_x, temp_y)
 
-
-
-########################################################################################################
-
-
-
 # Midpoint Circle Algorithm
 def drawCircle(cx, cy, r):
    x = 0
    y = r
    d = 1 - r
-
 
    while x <= y:
        glVertex2f(cx + x, cy + y)
@@ -137,12 +181,6 @@ def drawCircle(cx, cy, r):
            d = d + incrSE
        x += 1
 
-
-
-
-########################################################################################################
-
-
 # Draw circle
 def allCircles(cx, cy, r):
  n = 400
@@ -157,10 +195,6 @@ def allCircles(cx, cy, r):
      y = r * math.sin(theta * i)
      drawCircle(cx + x, cy + y, r)
      i += 1
-
-
-########################################################################################################
-
 
 # Draw  square
 def showSquare(x, y, size):
@@ -178,13 +212,9 @@ def showSquare(x, y, size):
    # Right edge
    drawLines(x + width, y - width, x + width, y + width)
 
-
    # Fill the square
    for i in range(x - width, x + width):
        drawLines(i, y - width, i, y + width)
-
-
-########################################################################################################
 
 # Draw the snake
 def drawSnake(snake):
@@ -202,9 +232,6 @@ def drawSnake(snake):
         x, y = seg
         showSquare(x * 10 + 5, y * 10 + 5, 10)
 
-
-########################################################################################################
-
 # Draw the food (food type : circle and square)
 def showFood(food, food_type):
    x, y = food
@@ -218,18 +245,12 @@ def showFood(food, food_type):
        showSquare(x * 10 + 5, y * 10 + 5, 6)
    glEnd()
 
-
-########################################################################################################
-
 #Restart Button(Left Arrow Button)
 def drawRestartButton():
    glColor3f(0.0, 1.0, 1.0)
    drawLines(20, 460, 60, 460)
    drawLines(20, 460, 40, 440)
    drawLines(20, 460, 40, 480)
-
-
-########################################################################################################
 
 #Play Button
 def drawPlayButton():
@@ -238,16 +259,11 @@ def drawPlayButton():
    drawLines(245, 440, 275, 460)
    drawLines(245, 480, 275, 460)
 
-########################################################################################################
-
 #Pause Button
 def drawPauseButton():
    glColor3f(1.0, 0.75, 0.0)
    drawLines(245, 440, 245, 480)
    drawLines(255, 440, 255, 480)
-
-
-########################################################################################################
 
 #Cross Button (Red Cross Button)
 def drawExitButton():
@@ -255,28 +271,25 @@ def drawExitButton():
    drawLines(440, 440, 480, 480)
    drawLines(440, 480, 480, 440)
 
-########################################################################################################
-
-
 # Score Calculation + Game Update
 def animate(_):
    global snake_state, food_coordiate, food_type, direction, score, game_over
 
    if not game_over:
+       moveBubbles()
 
+   if not game_over:
        if not is_game_paused:
            head_x, head_y = snake_state[-1]
            new_head_x = (head_x + direction[0]) % 50
            new_head_y = (head_y + direction[1]) % 50
 
-
-           if (new_head_x, new_head_y) in snake_state: # head-body collision  ---> game over
+           if (new_head_x, new_head_y) in snake_state:  # head-body collision  ---> game over
                game_over = True
                glutPostRedisplay()
                return
 
-
-           if (new_head_x, new_head_y) == food_coordiate: # length increases with food intake + food types with different scores
+           if (new_head_x, new_head_y) == food_coordiate:  # length increases with food intake + food types with different scores
                if food_type == "square":
                    score += 30
                else:
@@ -287,25 +300,18 @@ def animate(_):
            else:
                snake_state.pop(0)
 
-
            snake_state.append((new_head_x, new_head_y))
            glutPostRedisplay()
            glutTimerFunc(150, animate, 0)
        else:
            glutPostRedisplay()
 
-
-
-########################################################################################################
-
-
 # Keyboard input function (Background Color Change)
 def keyboardListener(key, x, y):
-   global direction,bg_color
+   global direction, bg_color
 
-   if (not is_game_paused) :
-
-       #snake movement using key
+   if not is_game_paused:
+       # snake movement using key
        if key == b"u":
            if direction[1] == 0:
                direction = (0, 1)
@@ -319,43 +325,34 @@ def keyboardListener(key, x, y):
            if direction[0] == 0:
                direction = (1, 0)
 
-
        # bg color change
-       if key == b"m" :
-           bg_color = (1.0,1.0,1.0,1.0)
+       if key == b"m":
+           bg_color = (1.0, 1.0, 1.0, 1.0)
            print(f"Light mode activated\n=====\n")
-       elif key == b"n" :
-           bg_color = (0.0,0.0,0.0,0.0)
+       elif key == b"n":
+           bg_color = (0.0, 0.0, 0.0, 0.0)
            print(f"Dark mode activated\n=====\n")
 
        glutPostOverlayRedisplay()
 
-
-########################################################################################################
-
 # Arrow Keys For Snake Movement
 def specialKeyListener(key, x, y):
- global direction
- if not is_game_paused :
-    if key == GLUT_KEY_UP:
-        if direction[1] == 0:
-            direction = (0, 1)
-    elif key == GLUT_KEY_DOWN:
-        if direction[1] == 0:
-            direction = (0, -1)
-    elif key == GLUT_KEY_LEFT:
-        if direction[0] == 0:
-            direction = (-1, 0)
-    elif key == GLUT_KEY_RIGHT:
-        if direction[0] == 0:
-            direction = (1, 0)
+    global direction
+    if not is_game_paused:
+        if key == GLUT_KEY_UP:
+            if direction[1] == 0:
+                direction = (0, 1)
+        elif key == GLUT_KEY_DOWN:
+            if direction[1] == 0:
+                direction = (0, -1)
+        elif key == GLUT_KEY_LEFT:
+            if direction[0] == 0:
+                direction = (-1, 0)
+        elif key == GLUT_KEY_RIGHT:
+            if direction[0] == 0:
+                direction = (1, 0)
 
-
-########################################################################################################
-
-
-
-#Restart Game Function
+# Restart Game Function
 def restartGame():
    global score, snake_state, food_coordiate, direction, game_over, is_game_paused
    snake_state = [(10, 20), (10, 21), (10, 22)]
@@ -365,18 +362,17 @@ def restartGame():
        game_over = False
        glutTimerFunc(150, animate, 0)
 
-
-#Restart, Play, Pause, Exit Button Functionality
+# Restart, Play, Pause, Exit Button Functionality
 def mouseListener(button, state, x, y):
-  global is_game_paused, wind, game_over,score
+  global is_game_paused, wind, game_over, score
   # Convert Y coordinate
   y = 500 - y
 
   # if 3 buttons are clicked
   if button == GLUT_LEFT_BUTTON and state == GLUT_UP:
-      if is_game_paused == False:
+      if not is_game_paused:
           # Check if the click is within the pause button area
-           if 245 <= x <= 255 and 440 <= y <= 480 and game_over== False:
+           if 245 <= x <= 255 and 440 <= y <= 480 and not game_over:
               is_game_paused = True  # Pause the game
               glutTimerFunc(150, animate, 0)
               print(f"Paused\n=====\nTotal Score: {score}\n=====")
@@ -391,60 +387,70 @@ def mouseListener(button, state, x, y):
                print(f"Good Bye!!!\n=====\nScore: {score}\n=====\n")
                glutDestroyWindow(wind)
 
-
       else:
           # Check if the click is within the play button area
-          if 245 <= x <= 275 and 440 <= y <= 480 and game_over == False:
+          if 245 <= x <= 275 and 440 <= y <= 480 and not game_over:
               is_game_paused = False  # Resume the game
               print(f"Resumed\n=====\nScore:{score}\n=====")
               glutTimerFunc(150, animate, 0)
 
+def draw_gameover_screen():
+    """
+    Display the Game Over message and final score on the screen.
+    """
+    glColor3f(1.0, 0.0, 0.0)  # Set text color to red
+    glRasterPos2f(180, 250)  # Adjust position based on your window size
+    for char in "GAME OVER!":
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))
+
+    glRasterPos2f(180, 220)  # Adjust position for the score below the message
+    for char in f"Score: {score}":
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))
 
 
 # OpenGL display function
 def showScreen():
-  global is_game_paused,score
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-  glLoadIdentity()
-  iterate()
-  glClearColor(*bg_color)  # Black Background
-  glClear(GL_COLOR_BUFFER_BIT)
+    global is_game_paused, score
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+    iterate()
+    glClearColor(*bg_color)  # Black Background
+    glClear(GL_COLOR_BUFFER_BIT)
 
+    if not game_over:
+        drawBubbles()
+        adjustBubbles()
 
-  if is_game_paused:
-      glBegin(GL_POINTS)
-      drawPlayButton() #Game  Paused --> Play Button
-      glEnd()
+    if is_game_paused:
+        glBegin(GL_POINTS)
+        drawPlayButton()  # Game Paused --> Play Button
+        glEnd()
+    else:
+        glBegin(GL_POINTS)
+        drawPauseButton()  # Game Resume --> Pause Button
+        glEnd()
 
+    glBegin(GL_POINTS)
+    drawRestartButton()  # Restart Button
+    glEnd()
 
-  else :
-      glBegin(GL_POINTS)
-      drawPauseButton() #Game Resume --> Pause Button
-      glEnd()
+    glBegin(GL_POINTS)
+    drawExitButton()  # Exit Button
+    glEnd()
 
-  glBegin(GL_POINTS)
-  drawRestartButton() #Restart Button
-  glEnd()
+    glPointSize(2)
+    glBegin(GL_POINTS)
+    drawSnake(snake_state)
+    glEnd()
 
+    if not game_over:
+        showFood(food_coordiate, food_type)
+    else:
+        draw_gameover_screen()  # Call the game over screen here
+        glutSwapBuffers()
+        return
 
-  glBegin(GL_POINTS)
-  drawExitButton() #Exit Button
-  glEnd()
-
-
-  glPointSize(2)
-  glBegin(GL_POINTS)
-  drawSnake(snake_state)
-  glEnd()
-  if (game_over!= True):
-      showFood(food_coordiate, food_type)
-  else:
-       print(f"Game Over\n=====\nTotal Score:{score}\n=====\n")
-       return
-
-  glutSwapBuffers()
-
-
+    glutSwapBuffers()
 
 
 def iterate():
@@ -454,7 +460,6 @@ def iterate():
   glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)
   glMatrixMode(GL_MODELVIEW)
   glLoadIdentity()
-
 
 glutInit()
 glutInitDisplayMode(GLUT_RGBA)
@@ -467,6 +472,3 @@ glutSpecialFunc(specialKeyListener)
 glutKeyboardFunc(keyboardListener)
 glutTimerFunc(0, animate, 0)
 glutMainLoop()
-glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-glLoadIdentity()
-iterate()
