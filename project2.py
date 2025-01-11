@@ -29,12 +29,11 @@ bubbles = [
 # Modified drawBubble function to draw all bubbles
 def drawBubbles():
     for bubble in bubbles:
-        glColor3f(1.0, 0.0, 1.0)  # Purple bubble
+        glColor3f(1.0, 0.0, 1.0) 
         glBegin(GL_POINTS)
         drawCircle(bubble["position"][0] * 10 + 5, bubble["position"][1] * 10 + 5, 4)
         glEnd()
 
-# Modified moveBubble function to ensure proper position updates and screen boundaries
 def moveBubbles():
     global bubbles, game_over, score
 
@@ -62,13 +61,10 @@ def adjustBubbles():
     target_bubbles = max(1, initial_bubbles - score // 100)
 
     if len(bubbles) > target_bubbles:
-        # Calculate the number of bubbles to be removed
         bubbles_to_remove = len(bubbles) - target_bubbles
 
         # Remove excess bubbles
         bubbles = bubbles[:target_bubbles]
-
-        # Increase the speed of remaining bubbles
         for bubble in bubbles:
             bubble["speed"] += bubbles_to_remove + 0.002
 
@@ -95,42 +91,40 @@ def findZone(x1, y1, x2, y2):
        zone = 7
    return zone
 
-# Other Zones --> Zone 0
 def forConvertZone(x, y, zone):
-   if zone == 0:  # Zone 0 --> Zone 0
+   if zone == 0:
        return x, y
-   elif zone == 1:  # Zone 1 --> Zone 0
+   elif zone == 1: 
        return y, x
-   elif zone == 2:  # Zone 2 --> Zone 0
+   elif zone == 2:  
        return y, -x
-   elif zone == 3:  # Zone 3 --> Zone 0
+   elif zone == 3: 
        return -x, y
-   elif zone == 4:  # Zone 4 --> Zone 0
+   elif zone == 4:  
        return -x, -y
-   elif zone == 5:  # Zone 5 --> Zone 0
+   elif zone == 5:  
        return -y, -x
-   elif zone == 6:  # Zone 6 --> Zone 0
+   elif zone == 6: 
        return -y, x
-   elif zone == 7:  # Zone 7 --> Zone 0
+   elif zone == 7: 
        return x, -y
 
-# Zone 0 --> Other zones
 def backConvertZone(x, y, zone):
-   if zone == 0:  # zone 0 --> zone 0
+   if zone == 0:  
        return x, y
-   elif zone == 1:  # zone 0 --> zone 1
+   elif zone == 1: 
        return y, x
-   elif zone == 2:  # zone 0 --> zone 2
+   elif zone == 2: 
        return -y, x
-   elif zone == 3:  # zone 0 --> zone 3
+   elif zone == 3:  
        return -x, y
-   elif zone == 4:  # zone 0 --> zone 4
+   elif zone == 4:  
        return -x, -y
-   elif zone == 5:  # zone 0 --> zone 5
+   elif zone == 5: 
        return -y, -x
-   elif zone == 6:  # zone 0 --> zone 6
+   elif zone == 6:  
        return y, -x
-   elif zone == 7:  # zone 0 --> zone 7
+   elif zone == 7:  
        return x, -y
 
 # Midpoint Line Algorithm
@@ -199,20 +193,10 @@ def allCircles(cx, cy, r):
 # Draw  square
 def showSquare(x, y, size):
    width = size//2
-
-   # Top Edge
    drawLines(x - width, y + width, x + width, y + width)
-
-   # Bottom Edge
    drawLines(x - width, y - width, x + width, y - width)
-
-   # Left Edge
    drawLines(x - width, y - width, x - width, y + width)
-
-   # Right edge
    drawLines(x + width, y - width, x + width, y + width)
-
-   # Fill the square
    for i in range(x - width, x + width):
        drawLines(i, y - width, i, y + width)
 
@@ -232,20 +216,20 @@ def drawSnake(snake):
         x, y = seg
         showSquare(x * 10 + 5, y * 10 + 5, 10)
 
-# Draw the food (food type : circle and square)
+# Draw the food 
 def showFood(food, food_type):
    x, y = food
    glBegin(GL_POINTS)
-   if food_type == "circle": # score = 10
+   if food_type == "circle": 
        glColor3f(1.0,1.0,0.0)
        allCircles(x * 10 + 5, y * 10 + 5, 4)
 
-   elif food_type == "square": # score = 30
+   elif food_type == "square":
        glColor3f(random.random(),random.random(),random.random())
        showSquare(x * 10 + 5, y * 10 + 5, 6)
    glEnd()
 
-#Restart Button(Left Arrow Button)
+#Restart Button
 def drawRestartButton():
    glColor3f(0.0, 1.0, 1.0)
    drawLines(20, 460, 60, 460)
@@ -265,13 +249,13 @@ def drawPauseButton():
    drawLines(245, 440, 245, 480)
    drawLines(255, 440, 255, 480)
 
-#Cross Button (Red Cross Button)
+#Cross Button
 def drawExitButton():
    glColor3f(1.0, 0.0, 0.0)
    drawLines(440, 440, 480, 480)
    drawLines(440, 480, 480, 440)
 
-# Score Calculation + Game Update
+# Score Calculation 
 def animate(_):
    global snake_state, food_coordiate, food_type, direction, score, game_over
 
@@ -284,12 +268,12 @@ def animate(_):
            new_head_x = (head_x + direction[0]) % 50
            new_head_y = (head_y + direction[1]) % 50
 
-           if (new_head_x, new_head_y) in snake_state:  # head-body collision  ---> game over
+           if (new_head_x, new_head_y) in snake_state:  
                game_over = True
                glutPostRedisplay()
                return
 
-           if (new_head_x, new_head_y) == food_coordiate:  # length increases with food intake + food types with different scores
+           if (new_head_x, new_head_y) == food_coordiate:  
                if food_type == "square":
                    score += 30
                else:
@@ -306,12 +290,11 @@ def animate(_):
        else:
            glutPostRedisplay()
 
-# Keyboard input function (Background Color Change)
+# Keyboard input function 
 def keyboardListener(key, x, y):
    global direction, bg_color
 
    if not is_game_paused:
-       # snake movement using key
        if key == b"u":
            if direction[1] == 0:
                direction = (0, 1)
@@ -365,30 +348,26 @@ def restartGame():
 # Restart, Play, Pause, Exit Button Functionality
 def mouseListener(button, state, x, y):
   global is_game_paused, wind, game_over, score
-  # Convert Y coordinate
   y = 500 - y
 
   # if 3 buttons are clicked
   if button == GLUT_LEFT_BUTTON and state == GLUT_UP:
       if not is_game_paused:
-          # Check if the click is within the pause button area
            if 245 <= x <= 255 and 440 <= y <= 480 and not game_over:
-              is_game_paused = True  # Pause the game
+              is_game_paused = True  
               glutTimerFunc(150, animate, 0)
               print(f"Paused\n=====\nTotal Score: {score}\n=====")
-           # Check if the click is within the left arrow area
            elif 20 <= x <= 60 and 440 <= y <= 480:
               score = 0
               print(f"Starting Again!!!\n=====\nScore: {score}\n=====")
               restartGame()
-           # Check if the click is within the exit button area
+
            elif 440 <= x <= 480 and 440 <= y <= 480:
                game_over = True
                print(f"Good Bye!!!\n=====\nScore: {score}\n=====\n")
                glutDestroyWindow(wind)
 
       else:
-          # Check if the click is within the play button area
           if 245 <= x <= 275 and 440 <= y <= 480 and not game_over:
               is_game_paused = False  # Resume the game
               print(f"Resumed\n=====\nScore:{score}\n=====")
@@ -398,12 +377,12 @@ def draw_gameover_screen():
     """
     Display the Game Over message and final score on the screen.
     """
-    glColor3f(1.0, 0.0, 0.0)  # Set text color to red
-    glRasterPos2f(180, 250)  # Adjust position based on your window size
+    glColor3f(1.0, 0.0, 0.0)  
+    glRasterPos2f(180, 250)  
     for char in "GAME OVER!":
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))
 
-    glRasterPos2f(180, 220)  # Adjust position for the score below the message
+    glRasterPos2f(180, 220) 
     for char in f"Score: {score}":
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))
 
@@ -414,7 +393,7 @@ def showScreen():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     iterate()
-    glClearColor(*bg_color)  # Black Background
+    glClearColor(*bg_color) 
     glClear(GL_COLOR_BUFFER_BIT)
 
     if not game_over:
@@ -423,19 +402,19 @@ def showScreen():
 
     if is_game_paused:
         glBegin(GL_POINTS)
-        drawPlayButton()  # Game Paused --> Play Button
+        drawPlayButton()  
         glEnd()
     else:
         glBegin(GL_POINTS)
-        drawPauseButton()  # Game Resume --> Pause Button
+        drawPauseButton()  
         glEnd()
 
     glBegin(GL_POINTS)
-    drawRestartButton()  # Restart Button
+    drawRestartButton() 
     glEnd()
 
     glBegin(GL_POINTS)
-    drawExitButton()  # Exit Button
+    drawExitButton() 
     glEnd()
 
     glPointSize(2)
@@ -446,7 +425,7 @@ def showScreen():
     if not game_over:
         showFood(food_coordiate, food_type)
     else:
-        draw_gameover_screen()  # Call the game over screen here
+        draw_gameover_screen() 
         glutSwapBuffers()
         return
 
